@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        * {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+body {
+  background-image: url(poke.png);
+  background-size: 1500px 900px;
+  background-repeat: no-repeat;
+}
+.container {
+  width: 360px;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  top: 50%;
+  left: 50%;
+}
+#card {
+  position: relative;
+  width: 100%;
+  padding: 30px 20px;
+  box-shadow: 0 20px 30px rgba(0, 0, 0, 0.916);
+  border-radius: 10%;
+}
+#card img {
+  display: block;
+  width:220px;
+  max-height: 220px;
+  position: relative;
+  margin: 20px auto;
+
+}
+.hp {
+  width: 80px;
+  background-color: #ffffff;
+  text-align: center;
+  padding: 8px 0;
+  border-radius: 15%;
+  margin-left: auto;
+  font-weight: 400;
+}
+.poke-name {
+  text-align: center;
+  font-weight: 600;
+}
+.types {
+  display: flex;
+  justify-content: space-around;
+  margin: 20px 0 40px 0;
+}
+.hp span,.types span {
+  font-size: 17px;
+  letter-spacing: 0.4px;
+  font-weight: 600;
+}
+.types span {
+  padding: 5px 20px;
+  border-radius: 15%;
+  color: #ffffff;
+}
+.stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: center;
+}
+.stats p {
+  color: #404060;
+}
+#btn {
+  display: block;
+  padding: 15px 60px;
+  font-size: 18px;
+  background-color: #101010;
+  color: #ffffff;
+  position: relative;
+  margin: 50px auto;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 20px 30px rgba(0, 0, 0, 0.878);
+  border-radius: 20%;
+}
+    </style>
+ <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+ <title>Pokemon Card</title>
+ <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="container">
+  <div id="card"></div>
+  <button id="btn">Refresh ↻</button>
+</div>
+  <script src="script.js">
+      const typeColor = {
+  bug: "#26de81",
+  dragon: "#CEB154",
+  electric: "#F3C92A",
+  fairy: "#FF0069",
+  fighting: "#30336b",
+  fire: "#f0932b",
+  flying: "#81ecec",
+  grass: "#00b894",
+  ground: "#EFB549",
+  ghost: "#a55eea",
+  ice: "#74b9ff",
+  normal: "#95afc0",
+  poison: "#6c5ce7",
+  psychic: "#a29bfe",
+  rock: "#2d3436",
+  water: "#59A2E6",
+};
+const url = " https://pokeapi.co/api/v2/pokemon/";
+const card = document.getElementById("card");
+const btn = document.getElementById("btn");
+
+let getPokeData = () => {
+  let id = Math.floor(Math.random() * 150) + 1;
+  const finalUrl = url + id;
+  fetch(finalUrl)
+    .then((response) => response.json())
+    .then((data) => {
+      generateCard(data);
+    });
+};
+let generateCard = (data) => {
+  console.log(data);
+  const hp = data.stats[0].base_stat;
+  const imgSrc = data.sprites.other.dream_world.front_default;
+  const pokeName = data.name[0].toUpperCase() + data.name.slice(1);
+  const statAttack = data.stats[1].base_stat;
+  const statDefense = data.stats[2].base_stat;
+  const statSpeed = data.stats[5].base_stat;
+  const themeColor = typeColor[data.types[0].type.name];
+  console.log(themeColor);
+  card.innerHTML = `
+    <p class="hp">
+     <span>HP</span>
+       ${hp}
+    </p>
+      <img src=${imgSrc} />
+      <h2 class="poke-name">${pokeName}</h2>
+      <div class="types">  
+      </div>
+      <div class="stats">
+      <div>
+       <h3>${statAttack}</h3>
+       <p>Attack</p>
+      </div>
+      <div>
+       <h3>${statDefense}</h3>
+       <p>Defense</p>
+      </div>
+      <div>
+       <h3>${statSpeed}</h3>
+       <p>Speed</p>
+      </div>
+      </div>
+  `;
+  appendTypes(data.types);
+  styleCard(themeColor);
+};
+let appendTypes = (types) => {
+  types.forEach((item) => {
+    let span = document.createElement("SPAN");
+    span.textContent = item.type.name;
+    document.querySelector(".types").appendChild(span);
+  });
+};
+let styleCard = (color) => {
+  card.style.background = `radial-gradient(circle at 70% 0%, ${color} 46%,  #EEEEEE 36%)`;
+  card.querySelectorAll(".types span").forEach((typeColor) => {
+    typeColor.style.backgroundColor = color;
+  });
+};
+
+btn.addEventListener("click", getPokeData);
+window.addEventListener("load", getPokeData);
+  </script>
+</body>
+</html>
